@@ -1,12 +1,17 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './style.css';
+import "./style.css";
+import React from "react";
+import ReactDOM from "react-dom";
+import Game from "./game";
+import Card from 'react-bootstrap/Card';
+import {Button} from 'react-bootstrap';
 
-import { getGames, deleteGame } from './game-service';
-
+import { getGames, addGame } from "./game-service";
+import 'bootstrap/dist/css/bootstrap.min.css';
 class App extends React.Component {
   state = {
     games: [],
+    currentGame: "",
+    isEditMode: false,
   };
 
   componentDidMount = async () => {
@@ -16,31 +21,47 @@ class App extends React.Component {
   getGames = async () => {
     const games = await getGames();
     this.setState({ games });
-  }
+  };
 
-  deleteGame = async id => {
-    await deleteGame(id);
+  addGame = async (game) => {
+    await addGame(game);
     this.getGames();
+    this.setState({ currentGame: "" });
+  };
+
+  onGameChange = (evt) => {
+    const { value } = evt.target;
+    this.setState({ currentGame: value });
   };
 
   render() {
     const { games } = this.state;
     return (
       <div>
-        <h1>Game Library</h1>
-        <hr />
+        <h1 className="title font-2">Ste<span>am</span></h1>
         {games &&
-          games.map(game => (
-            <div key={game.id}>
-              <label>{game.name}</label>
-              <button>edit</button>
-              <button onClick={() => this.deleteGame(game.id)}>delete</button>
-            </div>
+          games.map((game) => (
+            <Card style={{ display:'flex' ,
+             width: '100%' , 
+             padding: '1rem' , 
+             margin : '1rem',
+             "box-shadow": '1px 1px 4px rgba(0,0,0,0.5)'
+            }}> <Game game={game} getGames={this.getGames} key={game.id} />  </Card>
           ))}
-          <input placeholder="game name" /><button>add new game</button>
+       <div className="addGameInput">
+        <input
+          placeholder="Game Name"
+          value={this.state.currentGame}
+          onChange={this.onGameChange}
+        />
+       </div>
+        <button  className="btn btn-primary btn-xl" onClick={() => this.addGame(this.state.currentGame)}>
+          Add new game
+        </button>
+       
       </div>
     );
   }
 }
 
-ReactDOM.render(<App />, document.getElementById('app-container'));
+ReactDOM.render(<App />, document.getElementById("app-container"));

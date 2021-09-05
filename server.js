@@ -2,13 +2,14 @@
 
 const shortid = require('shortid');
 const express = require('express');
-const bodyParser = require('body-parser');
+// const bodyParser = require('body-parser');
 const app = express();
 
 const PORT = 3000;
 
 /* Setup express middlewares */
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(allowCorsMiddleware);
 
 /* API */
@@ -64,8 +65,9 @@ function getGame(req, res) {
  * Body: { "name": "Fresh Prince" } */
 function addGame(req, res) {
   const name = req.body.name;
+  Object.keys(req).forEach(key => console.log(key, req[key]))
   if (!name) {
-    return res.status(401).end();
+    return res.sendStatus(400);
   }
   const newGame = { id: shortid.generate(), name };
   games = [...games, newGame];
